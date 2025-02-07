@@ -3735,7 +3735,8 @@ DND5E.conditionEffects = {
   crawl: new Set(["prone", "exceedingCarryingCapacity"]),
   petrification: new Set(["petrified"]),
   halfHealth: new Set(["exhaustion-4"]),
-  initiativeDisadvantage: new Set(["surprised"])
+  initiativeAdvantage: new Set(["invisible"]),
+  initiativeDisadvantage: new Set(["incapacitated", "surprised"])
 };
 
 /* -------------------------------------------- */
