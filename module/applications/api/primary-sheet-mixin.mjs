@@ -231,9 +231,6 @@ export default function PrimarySheetMixin(Base) {
 
       // Add event listeners
       this.element.querySelectorAll(".item-tooltip").forEach(this._applyItemTooltips.bind(this));
-
-      // Disable fields in play mode
-      if ( this._mode === this.constructor.MODES.PLAY ) this._disableFields();
     }
 
     /* -------------------------------------------- */
@@ -349,8 +346,7 @@ export default function PrimarySheetMixin(Base) {
     /** @inheritDoc */
     async _onDragStart(event) {
       await super._onDragStart(event);
-      if ( !this.document.isOwner
-        || this.document[game.release.generation < 13 ? "compendium" : "collection"]?.locked ) {
+      if ( !this.document.isOwner || this.document.collection?.locked ) {
         event.dataTransfer.effectAllowed = "copyLink";
       }
     }
