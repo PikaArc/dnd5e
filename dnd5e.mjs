@@ -160,11 +160,7 @@ Hooks.once("init", function() {
     makeDefault: true,
     label: "DND5E.SheetClassCharacter"
   });
-  Actors.registerSheet("dnd5e", applications.actor.ActorSheet5eNPC, {
-    types: ["npc"],
-    label: "DND5E.SheetClassNPCLegacy"
-  });
-  DocumentSheetConfig.registerSheet(Actor, "dnd5e", applications.actor.ActorSheet5eNPC2, {
+  DocumentSheetConfig.registerSheet(Actor, "dnd5e", applications.actor.NPCActorSheet, {
     types: ["npc"],
     makeDefault: true,
     label: "DND5E.SheetClassNPC"

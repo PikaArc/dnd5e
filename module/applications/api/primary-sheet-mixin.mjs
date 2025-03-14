@@ -1,3 +1,5 @@
+import { parseInputDelta } from "../../utils.mjs";
+import ItemSheet5e2 from "../item/item-sheet-2.mjs";
 import DragDropApplicationMixin from "../mixins/drag-drop-mixin.mjs";
 
 /**
@@ -11,6 +13,17 @@ import DragDropApplicationMixin from "../mixins/drag-drop-mixin.mjs";
  */
 export default function PrimarySheetMixin(Base) {
   return class PrimarySheet5e extends DragDropApplicationMixin(Base) {
+    /** @override */
+    static DEFAULT_OPTIONS = {
+      actions: {
+        editDocument: PrimarySheet5e.#showDocument,
+        deleteDocument: PrimarySheet5e.#deleteDocument,
+        showDocument: PrimarySheet5e.#showDocument
+      }
+    };
+
+    /* -------------------------------------------- */
+
     /**
      * @typedef {object} SheetTabDescriptor5e
      * @property {string} tab                       The tab key.
@@ -31,6 +44,8 @@ export default function PrimarySheetMixin(Base) {
      * @type {SheetTabDescriptor5e[]}
      */
     static TABS = [];
+
+    /* -------------------------------------------- */
 
     /**
      * Available sheet modes.
@@ -233,7 +248,17 @@ export default function PrimarySheetMixin(Base) {
       this.element.querySelectorAll(".item-tooltip").forEach(this._applyItemTooltips.bind(this));
 
       // Disable fields in play mode
-      if ( this._mode === this.constructor.MODES.PLAY ) this._disableFields();
+      // TODO: Move to ItemSheet5e
+      // if ( this._mode === this.constructor.MODES.PLAY ) this._disableFields();
+
+      if ( this.isEditable ) {
+        // Automatically select input contents when focused
+        this.element.querySelectorAll("input").forEach(e => e.addEventListener("focus", e.select));
+
+        // Handle delta inputs
+        this.element.querySelectorAll('input[type="text"][data-dtype="Number"]')
+          .forEach(i => i.addEventListener("change", this._onChangeInputDelta.bind(this)));
+      }
     }
 
     /* -------------------------------------------- */
@@ -290,6 +315,55 @@ export default function PrimarySheetMixin(Base) {
     /* -------------------------------------------- */
 
     /**
+     * Handle removing an document.
+     * @this {PrimarySheet5e}
+     * @param {Event} event         Triggering click event.
+     * @param {HTMLElement} target  Button that was clicked.
+     */
+    static async #deleteDocument(event, target) {
+      if ( await this._deleteDocument(event, target) !== false ) return;
+      const uuid = target.closest("[data-uuid]").dataset?.uuid;
+      const doc = await fromUuid(uuid);
+      doc?.deleteDialog();
+    }
+
+    /**
+     * Handle removing an document.
+     * @param {Event} event         Triggering click event.
+     * @param {HTMLElement} target  Button that was clicked.
+     * @returns {any}               Return `false` to continue with base sheet's options.
+     */
+    async _deleteDocument(event, target) {
+      return false;
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle input changes to numeric form fields, allowing them to accept delta-typed inputs.
+     * @param {Event} event  Triggering event.
+     * @protected
+     */
+    _onChangeInputDelta(event) {
+      const input = event.target;
+      const target = this.actor.items.get(input.closest("[data-item-id]")?.dataset.itemId) ?? this.actor;
+      const { activityId } = input.closest("[data-activity-id]")?.dataset ?? {};
+      const activity = target?.system.activities?.get(activityId);
+      const result = parseInputDelta(input, activity ?? target);
+      if ( result !== undefined ) {
+        // Special case handling for Item uses.
+        if ( input.dataset.name === "system.uses.value" ) {
+          target.update({ "system.uses.spent": target.system.uses.max - result });
+        } else if ( activity && (input.dataset.name === "uses.value") ) {
+          target.updateActivity(activityId, { "uses.spent": activity.uses.max - result });
+        }
+        else target.update({ [input.dataset.name]: result });
+      }
+    }
+
+    /* -------------------------------------------- */
+
+    /**
      * Handle the user toggling the sheet mode.
      * @param {Event} event  The triggering event.
      * @protected
@@ -311,6 +385,32 @@ export default function PrimarySheetMixin(Base) {
     _onClickAction(event, target) {
       if ( target.dataset.action === "addDocument" ) this._addDocument(event, target);
       else super._onClickAction(event, target);
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle opening a document sheet.
+     * @this {PrimarySheet5e}
+     * @param {Event} event         Triggering click event.
+     * @param {HTMLElement} target  Button that was clicked.
+     */
+    static async #showDocument(event, target) {
+      if ( await this._showDocument(event, target) !== false ) return;
+      const uuid = target.closest("[data-uuid]")?.dataset.uuid;
+      const doc = await fromUuid(uuid);
+      const mode = target.dataset.action === "showDocument" ? "PLAY" : "EDIT";
+      doc?.sheet?.render({ force: true, mode: ItemSheet5e2.MODES[mode] });
+    }
+
+    /**
+     * Handle opening a document sheet.
+     * @param {Event} event         Triggering click event.
+     * @param {HTMLElement} target  Button that was clicked.
+     * @returns {any}               Return `false` to continue with base sheet's options.
+     */
+    async _showDocument(event, target) {
+      return false;
     }
 
     /* -------------------------------------------- */
@@ -349,8 +449,7 @@ export default function PrimarySheetMixin(Base) {
     /** @inheritDoc */
     async _onDragStart(event) {
       await super._onDragStart(event);
-      if ( !this.document.isOwner
-        || this.document[game.release.generation < 13 ? "compendium" : "collection"]?.locked ) {
+      if ( !this.document.isOwner || this.document.collection?.locked ) {
         event.dataTransfer.effectAllowed = "copyLink";
       }
     }

@@ -5,9 +5,8 @@
 .dnd5e2.sheet.actor.npc {
   --dnd5e-sheet-header-height: 68px;
   --dnd5e-sheet-sidebar-width: 180px;
-  min-width: 700px;
-  min-height: 700px;
-  box-shadow: none;
+  // min-width: 700px;
+  // min-height: 700px;
 
   &.minimized {
     box-shadow: 0 0 20px var(--color-shadow-dark);
@@ -22,7 +21,7 @@
 
   .window-header .header-elements {
     flex: none;
-    color: var(--color-text-dark-primary);
+    color: var(--color-text-primary);
     font-family: var(--dnd5e-font-roboto-condensed);
     display: flex;
     align-items: center;
@@ -47,19 +46,14 @@
 
     i {
       font-size: var(--font-size-11);
-      color: var(--color-text-light-6);
+      color: var(--color-light-6);
       margin: 0;
     }
   }
 
   .window-content {
-    background: url("ui/texture1.webp") no-repeat top center / auto 770px,
-      var(--dnd5e-color-parchment) url("ui/texture2.webp") no-repeat bottom center / auto 704px;
-
-    > form {
-      display: flex;
-      flex-direction: column;
-    }
+    display: flex;
+    flex-direction: column;
   }
 
   /* ---------------------------------- */
@@ -68,7 +62,7 @@
 
   .sheet-header {
     gap: 12px;
-    padding: 38px 12px 0;
+    padding-inline: 12px;
     align-items: stretch;
 
     > .left { flex: 0 0 var(--dnd5e-sheet-sidebar-width); }
@@ -117,9 +111,14 @@
         text-shadow: 0 0 4px var(--dnd5e-color-gold);
         cursor: pointer;
         border-radius: 100%;
-        color: var(--color-text-light-0);
+        color: var(--color-light-1);
         border: 2px solid var(--dnd5e-color-gold);
         clip-path: polygon(48.5% 0, 91% 25%, 92% 75%, 49% 100%, 6% 75%, 7% 25%);
+
+        .control-button {
+          color: inherit;
+          font-size: inherit;
+        }
       }
 
       .initiative-score {
@@ -315,7 +314,7 @@
     /* Proficiency */
     .proficiency {
       text-align: right;
-      .sign { color: var(--color-text-light-6); }
+      .sign { color: var(--color-light-6); }
       > span { font-family: var(--dnd5e-font-roboto-condensed); }
     }
 
@@ -365,7 +364,7 @@
         }
       }
 
-      .sign { color: var(--color-text-light-6); }
+      .sign { color: var(--color-light-6); }
 
       .label {
         text-transform: uppercase;
@@ -408,7 +407,7 @@
           &:hover .save { text-shadow: 0 0 8px var(--color-shadow-primary); }
         }
 
-        > i { color: var(--color-text-light-6); }
+        > i { color: var(--color-light-6); }
       }
     }
 
@@ -427,7 +426,7 @@
         gap: 4px;
 
         > span.label {
-          color: var(--color-text-dark-5);
+          color: var(--color-dark-5);
           font-size: var(--font-size-10);
           font-weight: normal;
         }
@@ -624,10 +623,10 @@
           padding: 8px 4px 8px 16px;
           gap: 8px;
 
-          &.spells, &.biography { flex-direction: column; }
+          &[data-tab="spells"], &[data-tab="biography"] { flex-direction: column; }
           &:not(.active) { display: none; }
 
-          &:not(.biography, .inventory) {
+          &:not([data-tab="biography"], [data-tab="inventory"], [data-tab="specialTraits"]) {
             // enough room that the "create new" button doesn't overlap when scrolled all the way down
             padding-bottom: calc(1.5rem + 30px);
           }
@@ -649,6 +648,8 @@
           gap: 8px;
 
           .encumbrance {
+            block-size: 28px;
+            margin-inline-end: 38px;
             border: var(--dnd5e-border-gold);
             border-radius: 3px;
             box-shadow: 0 0 6px var(--dnd5e-shadow-45);
@@ -689,10 +690,10 @@
           border: none;
           background: none;
 
-          option { color: var(--color-text-dark-primary); }
+          option { color: var(--color-text-primary); }
         }
 
-        .config-button {
+        .control-button {
           flex: 1;
           display: grid;
           place-content: center;
@@ -717,7 +718,7 @@
       }
 
       /* Biography */
-      .tab.biography {
+      [data-tab="biography"] {
         .top {
           display: flex;
           align-items: stretch;
@@ -734,7 +735,7 @@
             box-shadow: none;
             inset: auto auto -3px 100%;
             font-size: var(--font-size-18);
-            color: var(--color-text-dark-primary);
+            color: var(--color-text-primary);
             padding: 0;
           }
         }
@@ -748,16 +749,16 @@
   /*  Child Creation                    */
   /* ---------------------------------- */
 
-  form.tab-inventory > .create-child { display: none; }
+  &.tab-inventory > .create-child { display: none; }
 
   /* ---------------------------------- */
   /*  Edit Mode                         */
   /* ---------------------------------- */
 
-  form.editable {
+  &.editable {
     .sheet-header {
       .labels, > .left {
-        color: var(--color-text-dark-primary);
+        color: var(--color-text-primary);
 
         li + li::before { content: "" }
         > li { flex: 1; }
@@ -810,12 +811,12 @@
       .vitals .hit-points .label {
         padding-inline-end: 6px;
 
-        .config-button {
+        .control-button {
           font-size: var(--font-size-10);
           margin-left: auto;
         }
 
-        .bonus + .config-button { margin-left: 2px; }
+        .bonus + .control-button { margin-left: 2px; }
       }
 
       .legendary label > span.value { font-size: var(--font-size-16); }
@@ -826,7 +827,7 @@
   /*  Collapsed                         */
   /* ---------------------------------- */
 
-  form.collapsed {
+  &.sidebar-collapsed {
     .sheet-body .main-content .sidebar-collapser { left: 0; }
     .sidebar { margin-left: calc(var(--sidebar-size) * -1); }
   }

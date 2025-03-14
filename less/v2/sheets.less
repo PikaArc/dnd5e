@@ -17,6 +17,7 @@
       --slide-toggle-track-color-checked: var(--dnd5e-color-gold);
       --slide-toggle-track-color-unchecked: var(--dnd5e-color-light-gray);
       flex: none;
+      margin-inline-end: auto;
 
       .slide-toggle-thumb {
         line-height: 12px;
@@ -36,15 +37,20 @@
     }
   }
 
-  .window-content { margin-top: -30px; }
+  .window-content {
+    margin-top: -30px;
+    padding-inline: 0;
+  }
 
   /* ---------------------------------- */
   /*  Sheet Header                      */
   /* ---------------------------------- */
 
   .sheet-header {
+    display: flex;
+
     input, select {
-      --input-placeholder-color: var(--color-text-light-6);
+      --input-placeholder-color: var(--color-light-6);
       --input-height: var(--form-field-height, 26px);
       background: rgb(0 0 0 / 45%);
       border: 1px solid transparent;
@@ -70,12 +76,12 @@
     background: transparent no-repeat center / contain;
     font-family: var(--dnd5e-font-roboto);
     font-weight: bold;
-    color: var(--color-text-light-0);
+    color: var(--color-light-1);
     display: grid;
     place-content: center;
     font-size: var(--font-size-30);
 
-    .config-button {
+    .config-button, .control-button {
       color: inherit;
       font-size: inherit;
     }
@@ -112,8 +118,13 @@
     position: absolute;
     inset: auto 16px 16px auto;
   }
+  &.standard-form .create-child {
+    height: 30px;
+    line-height: normal;
+  }
 
-  form:is(.tab-inventory, .tab-features, .tab-spells, .tab-effects, .tab-advancement, .tab-activities) .create-child {
+  form:is(.tab-inventory, .tab-features, .tab-spells, .tab-effects, .tab-advancement, .tab-activities) .create-child,
+  &:is(.tab-inventory, .tab-features, .tab-spells, .tab-effects, .tab-advancement, .tab-activities) .create-child {
     display: block;
   }
 }
