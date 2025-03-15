@@ -1,6 +1,6 @@
 {
-  "id": "dnd5e",
-  "title": "Dungeons & Dragons Fifth Edition",
+  "id": "dnd5e-mod",
+  "title": "Dungeons & Dragons Fifth Edition: Modified for Testing",
   "description": "A system for playing the fifth edition of the world's most popular role-playing game in the Foundry Virtual Tabletop environment.",
   "version": "4.3.6",
   "compatibility": {
